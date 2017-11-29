@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		
+		<style>
+			div {
+				width: 200px;
+				height: 200px;
+				border: 1px solid red;
+				
+				position: absolute;
+			}
+		</style>
+	</head>
+	<body>
+		
+		
+
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.drag.js"></script>
+    <script src="js/jquery.drop.js"></script>
+    
+	<script>
+		
+var i = 1;
+
+
+// 定义1个构造函数
+//  $parent 代表要放入的父元素
+function DragBox($parent) {
+	this.parent = $parent
+	
+	// 创建1个div
+	this.ele = document.createElement("div");
+	
+	// 设置div中的内容
+	this.ele.innerHTML = i++;
+	
+	var self = this;
+	
+	$(this.ele).drop(function (e) {
+		// 在这个盒子中释放的时候，会自动调用这个函数
+		console.log(e);
+		
+		// e.srcElement 事件发生的原始元素
+		console.log("srcElement" + e.srcElement.innerHTML);
+		console.log("this:" + this);
+		console.log("this:" + this.innerHTML);
+		
+		if (e.srcElement == self.ele) {
+			console.log("is same");
+			return ;
+		}
+		
+		var w = $(self.ele).width();
+		
+		var $div1 = $("<div></div>");
+		var $div2 = $("<div></div>");
+		
+		$div1.width(w/2);
+		$div2.css({
+			width: w/2,
+			left: w/2
+		})
+	
+		$div1.html(self.ele.innerHTML) ;
+		$div2.html(e.srcElement.innerHTML) ;
+		
+		$(self.ele).html("");
+		$(self.ele).append($div1);
+		$(self.ele).append($div2);
+		
+		// 原本的父元素不具备放下的功能
+		$(self.ele).drop(null);
+		
+		$(e.srcElement).remove();
+		
+		$div1.drop(arguments.callee);
+		$div2.drop(arguments.callee);
+		
+		
+	});
+	$(this.ele).drag();
+	
+	$parent.append(this.ele);
+	
+	return this;
+}
+
+new DragBox($("body"))
+new DragBox($("body"))
+new DragBox($("body"))
+
+	</script>
+
+
+	</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		
+		<style>
+			div {
+				width: 200px;
+				height: 200px;
+				border: 1px solid red;
+				
+				position: absolute;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<div style="left: 200px;">2</div>
+		<div style="left: 400px;">3</div>
+		
+		
+
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.drag.js"></script>
+    <script src="js/jquery.drop.js"></script>
+    
+	<script>
+		
+$("div").drag();		
+		
+var i = 1;
+
+function DropBox($parent) {
+	this.ele = document.createElement("div");
+	$parent.append(this.ele);
+	
+	this.ele.innerHTML = i++;
+	
+	var self = this;
+	
+	$(this.ele).drop(function (e){
+			console.log(e);
+			
+			
+		var o1 = e.originalEvent.srcElement
+		
+		
+		if (e.srcElement == self.ele) {
+			console.log("is same");
+			return ;
+		}
+		
+		var d1 = new DropBox($(self.ele));
+		var d2 = new DropBox($(self.ele));
+		
+		var w = $(self.ele).width();
+		
+		$(d1.ele).width(w/2);
+		$(d2.ele).css({
+			width: w/2,
+			left: w/2
+		})
+	
+		// 设置内容
+		$(d1.ele).html(self.ele.innerHTML) ;
+		$(d2.ele).html(e.srcElement.innerHTML) ;
+		
+		// 清空父元素
+		$(self.ele).html("");
+		
+		// 添加2个子元素
+		$(self.ele).append(d1.ele);
+		$(self.ele).append(d2.ele);
+		
+		// 移除拖进来的元素
+		$(e.srcElement).remove();
+		
+	});
+	
+	return this;
+}
+
+new DropBox($("body"))
+
+	</script>
+
+
+	</body>
+</html>

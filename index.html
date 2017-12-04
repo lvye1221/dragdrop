@@ -117,9 +117,10 @@ function DragBox($parent, html) {
 			$(oDiv1).html("");
 
 			// 测试输出
-			console.log("new1: ", html1)
-			console.log("new2: ", html2)
+			//console.log("new1: ", html1)
+			// console.log("new2: ", html2)
 
+			// 创建2个新的拖拽物体
 			var o1 = new DragBox($(oDiv1), html1);
 			var o2 = new DragBox($(oDiv1), html2);
 			
@@ -132,7 +133,7 @@ function DragBox($parent, html) {
 			// 原本的父元素不具备放下的功能
 			// $(self.ele).drop(null);
 
-			console.log( oDiv1.dragbox )
+			// console.log( oDiv1.dragbox )
 			oDiv1.dragbox.unsetlisten();
 			
 			$(oDiv2).remove();
@@ -151,7 +152,7 @@ DragBox.prototype.setlisten = function() {
 
 	console.log(this.drop);
 
-	// 将当前对象传递过去
+	// 绑定监听函数，监听函数为对象自己的drop函数
     $(document).bind("mouseup", this, this.drop);
 }
 
@@ -159,8 +160,7 @@ DragBox.prototype.setlisten = function() {
 // 取消元素设置监听
 DragBox.prototype.unsetlisten = function() {
 
-	console.log("unsetlisten")
-
+	// 取消自己的鼠标释放监听函数
     $(document).unbind("mouseup", this.drop);
 
 	// 当前元素不允许再拖拽

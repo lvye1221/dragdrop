@@ -1,7 +1,9 @@
 
 # 设计思路
 
-1. 创建构造函数 DragBox
+构造函数 DragBox
+
+```
 	属性：	ele
 			isdraged  是否被拖拽
 			dragbox   拖拽的对象
@@ -10,6 +12,7 @@
 		setlisten	设置放下监听
 		unsetlisten	取消放下监听
 
+```
 
 
 # 遇到的问题及解决方法

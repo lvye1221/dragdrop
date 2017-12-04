@@ -24,14 +24,6 @@
     
 	<script>
 
-
-$(document).on("mouseup", function() {
-	console.log(1);	
-});
-
-$(document).on("mouseup", function() {
-	console.log(2);	
-});
 		
 
 var i = 1;
@@ -44,6 +36,11 @@ function DragBox($parent, html) {
 	
 	// 创建1个div
 	this.ele = document.createElement("div");
+
+	// 是否被拖拽
+	this.ele.isdraged = false;
+	// 备份当前对象
+	this.ele.dragbox = this;
 	
 	// 设置div中的内容
 	if (html != undefined) {
@@ -52,59 +49,124 @@ function DragBox($parent, html) {
 		this.ele.innerHTML = i++;
 	}
 	
-	var self = this;
+	// 拖拽当前物体
+	$(this.ele).drag({
+		onDrag: function(event, elem) {
+			elem.isdraged = true;
+		},
+		onDrop: function(event, elem) {
+			elem.isdraged = false;
+		}
+	});
 	
-	$(this.ele).drop(function (e) {
-		// 在这个盒子中释放的时候，会自动调用这个函数
-		console.log(e);
+	// 添加到元素中
+	$parent.append(this.ele);
+
+	// 鼠标释放时的事件处理
+	// 注意，这里设为每个drop函数不一样，便于取消特定盒子的框
+	this.drop = function(e) {
 		
-		// e.srcElement 事件发生的原始元素
-		console.log("srcElement" + e.srcElement.innerHTML);
-		console.log("self:" + self);
-		console.log("self.ele.innerHTML:" + self.ele.innerHTML);
-		
-		if (e.srcElement == self.ele) {
-			console.log("is same");
+		// 当前元素对象
+		var self = e.data
+
+		if (self == undefined) {
 			return ;
 		}
-		
 
+		var $elem = $(self.ele)
 
-		var w = $(self.ele).width();
-		
-		// 先备份
-		var html1 = self.ele.innerHTML
-		var html2 = e.srcElement.innerHTML
+		var offset = $elem.offset();
+		var dimensions = {
+			left: offset.left - $(document).scrollLeft(),
+			top: offset.top - $(document).scrollTop(),
+			right: offset.left + $elem.width(),
+			bottom: offset.top + $elem.height()
+		};
 
-		// 清空原本
-		$(self.ele).html("");
+		// 判断当前释放鼠标的地方是否在对应盒子上面
+		var in_item = (dimensions.left <= e.clientX) && (e.clientX <= dimensions.right) && (dimensions.top <= e.clientY) && (e.clientY <= dimensions.bottom);
 
-		// 测试输出
-		console.log("new1: ", html1)
-		console.log("new2: ", html2)
+		// 如果释放鼠标位置，在对应区域中
+		if (in_item) {
 
-		var o1 = new DragBox($(self.ele), html1);
-		var o2 = new DragBox($(self.ele), html2);
-		
-		$(o1.ele).width(w/2);
-		$(o2.ele).css({
-			width: w/2,
-			left: w/2
-		})
-		
-		
-		// 原本的父元素不具备放下的功能
-		$(self.ele).drop(null);
-		
-		$(e.srcElement).remove();
-	});
+			if (e.srcElement == self.ele) {
+				console.log("is same");
+				return ;
+			}
 
-	$(this.ele).drag();
-	
-	$parent.append(this.ele);
+			var oDiv1 = null; // 被放的物体
+			var oDiv2 = null; // 拖拽物体
+
+			// 判断拖拽的物体，
+			if (self.ele.isdraged) {
+				oDiv1 = e.srcElement
+				oDiv2 = self.ele
+			} else {
+				oDiv1 = self.ele
+				oDiv2 = e.srcElement
+			}
+
+			
+			// 先备份元素中的内容
+			var html1 = oDiv1.innerHTML
+			var html2 = oDiv2.innerHTML
+
+			var w = $(oDiv1).width();
+
+			// 清空原本
+			$(oDiv1).html("");
+
+			// 测试输出
+			console.log("new1: ", html1)
+			console.log("new2: ", html2)
+
+			var o1 = new DragBox($(oDiv1), html1);
+			var o2 = new DragBox($(oDiv1), html2);
+			
+			$(o1.ele).width(w/2);
+			$(o2.ele).css({
+				width: w/2,
+				left: w/2
+			})
+			
+			// 原本的父元素不具备放下的功能
+			// $(self.ele).drop(null);
+
+			console.log( oDiv1.dragbox )
+			oDiv1.dragbox.unsetlisten();
+			
+			$(oDiv2).remove();
+
+		}
+	}
+
+	this.setlisten()
 	
 	return this;
 }
+
+
+// 给元素设置监听
+DragBox.prototype.setlisten = function() {
+
+	console.log(this.drop);
+
+	// 将当前对象传递过去
+    $(document).bind("mouseup", this, this.drop);
+}
+
+
+// 取消元素设置监听
+DragBox.prototype.unsetlisten = function() {
+
+	console.log("unsetlisten")
+
+    $(document).unbind("mouseup", this.drop);
+
+	// 当前元素不允许再拖拽
+	$(this.ele).off("mousedown");
+}
+
 
 new DragBox($("body"))
 new DragBox($("body"))

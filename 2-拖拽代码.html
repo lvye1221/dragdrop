@@ -39,14 +39,13 @@ function DropBox($parent) {
 	
 	var self = this;
 	
+	$(this.ele).drag();
 	$(this.ele).drop(function (e){
-			console.log(e);
+		console.log(e);
 			
-			
-		var o1 = e.originalEvent.srcElement
+		var o1 = e.srcElement
 		
-		
-		if (e.srcElement == self.ele) {
+		if (o1 == self.ele) {
 			console.log("is same");
 			return ;
 		}
@@ -64,7 +63,7 @@ function DropBox($parent) {
 	
 		// 设置内容
 		$(d1.ele).html(self.ele.innerHTML) ;
-		$(d2.ele).html(e.srcElement.innerHTML) ;
+		$(d2.ele).html(o1.innerHTML) ;
 		
 		// 清空父元素
 		$(self.ele).html("");
@@ -74,13 +73,15 @@ function DropBox($parent) {
 		$(self.ele).append(d2.ele);
 		
 		// 移除拖进来的元素
-		$(e.srcElement).remove();
+		$(o1).remove();
 		
 	});
 	
 	return this;
 }
 
+new DropBox($("body"))
+new DropBox($("body"))
 new DropBox($("body"))
 
 	</script>
